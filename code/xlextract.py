@@ -12,6 +12,12 @@ import xlrd
 # https://github.com/scraperwiki/scraperwiki_local
 import scraperwiki
 
+Odict = dict
+try:
+    from collections import OrderedDict as Odict
+except ImportError:
+    pass
+
 def extract(filename):
     """Do somethng with an Excel spreadsheet."""
 
@@ -44,7 +50,7 @@ def sheetExtract(sheet):
         else:
             zipped = zip(header, row)
             # ignore pairs with no header.
-            d = dict(((k,v) for k,v in zipped if k != ''))
+            d = Odict(((k,v) for k,v in zipped if k != ''))
             yield d
 
 

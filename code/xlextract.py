@@ -54,6 +54,8 @@ def main(argv=None):
         argv = sys.argv
     if len(argv) > 1:
         filename = argv[1]
+    if len(argv) != 2:
+        print >> sys.stderr, "Please supply exactly one argument"
     extract(filename)
 
 if __name__ == '__main__':

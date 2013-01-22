@@ -5,6 +5,7 @@
 and store it in a tabular database.
 """
 
+# http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
 
 def extract(filename):
@@ -13,7 +14,20 @@ def extract(filename):
     # :todo: consider providing encoding_override feature.
     book = xlrd.open_workbook(filename=filename)
     for sheetName in book.sheet_names():
-      print sheetName
+      sheet = book.sheet_by_name(sheetName)
+      sheetExtract(sheet)
+
+def sheetExtract(sheet):
+    """Do something with a sheet (xlrd.Sheet) from an
+    Excel spreadsheet."""
+
+    print "Extracting %r ..." % sheet.name
+    rows = sheet.nrows
+    cols = sheet.ncols
+    print "%r cols by %r rows" % (cols, rows)
+    for r in range(rows):
+        print [sheet.cell_value(r, c) for c in range(cols)]
+
 
 def main(argv=None):
     import sys

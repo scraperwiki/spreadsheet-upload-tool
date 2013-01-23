@@ -1,0 +1,5 @@
+{
+  "displayName": "Upload a Spreadsheet",
+  "gitUrl": "git://github.com/scraperwiki/spreadsheet-download-tool.git",
+  "description": "Upload an Excel file or CSV"
+}

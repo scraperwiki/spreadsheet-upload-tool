@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
+    <script src="http://coffeescript.org/extras/coffee-script.js"></script> 
+    <script src="http://x.scraperwiki.com/js/custard.js"></script> 
+  </head>
+  <body>
+    <h1>Parsing</h1>
+    <pre>
+    </pre>
+    <script type="text/coffeescript">
+      $ ->
+        settings = readSettings()
+        exec("cd; pwd; python */code/xlextract.py ~/incoming/#{settings.filePath}")
+          .success( -> console.log 'wooo! success!' )
+          .error( -> console.log 'error, grrr' )
+    </script>
+  </body>
+</html>
+

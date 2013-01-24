@@ -1,20 +1,54 @@
+<!doctype html>
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js" type="text/javascript"></script>
-    <script src="http://coffeescript.org/extras/coffee-script.js"></script> 
-    <script src="http://x.scraperwiki.com/js/custard.js"></script> 
+      <meta charset="utf-8">
+      <title>Uploading spreadsheet</title>
+      <meta name="author" content="ScraperWiki Ltd">
+      <link rel="stylesheet" href="http://x.scraperwiki.com/vendor/style/bootstrap.min.css">
+      <link rel="stylesheet" href="http://x.scraperwiki.com/vendor/style/metro.bootstrap.css">
+      <link rel="stylesheet" href="style.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+      <script src="http://x.scraperwiki.com/vendor/js/bootstrap.min.js"></script>
+      <script src="http://coffeescript.org/extras/coffee-script.js"></script>
+      <script src="http://x.scraperwiki.com/js/custard.js"></script>
+      <meta http-equiv="cleartype" content="on">
   </head>
   <body>
-    <h1>Parsing</h1>
-    <pre>
-    </pre>
+    <p class="loading">Reading your spreadsheet&hellip;</p>
     <script type="text/coffeescript">
+
+      showAlert = (title, message, level) ->
+        # [title] and [message] should be html strings. The first is displayed in bold.
+        # If [level] is a truthful value, the alert is printed in red.
+        level = level or 0
+        $div = $("<div>").addClass("alert").text message
+        $div.append '<button type="button" class="close" data-dismiss="alert">×</button>'
+        $div.prepend "<strong>#{title}</strong> "
+        $div.addClass("alert-error") if level
+        $div.prependTo "body"
+
       $ ->
         settings = readSettings()
-        exec("cd; pwd; python */code/xlextract.py ~/incoming/#{settings.filePath}")
-          .success( -> console.log 'wooo! success!' )
-          .error( -> console.log 'error, grrr' )
+        exec("cd; python */code/xlextract.py ~/incoming/#{settings.filePath} 2>>extract.log")
+          .done( (data) ->
+            $('p.loading').remove()
+            try
+              obj = JSON.parse(data)
+            catch error
+              showAlert("Unexpected output returned from extraction script", error, 1)
+              return false
+          
+            if obj.result?
+              $p = $('<p>').addClass('success').html('<b>Spreadsheet imported!</b> Please navigate to your dataset somehow. (Yes, this needs to be improved)')
+              $('body').append($p)
+            else
+              showAlert("Oh no!", "We received an error from the extraction script: #{obj.error}", 1)
+
+          ).fail( (jqXHR, textStatus, errorThrown) ->
+            $('p.loading').remove()
+            showAlert("Failed to contact box server", errorThrown, 1)
+          )
+
     </script>
   </body>
 </html>

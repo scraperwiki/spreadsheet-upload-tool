@@ -6,6 +6,7 @@ and store it in a tabular database.
 """
 
 import sys
+import json
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -23,7 +24,7 @@ def extract(filename):
 
     sheets = dict()
     # :todo: consider providing encoding_override feature.
-    book = xlrd.open_workbook(filename=filename)
+    book = xlrd.open_workbook(filename=filename, logfile=sys.stderr)
     for sheetName in book.sheet_names():
         sheet = book.sheet_by_name(sheetName)
         rows = list(sheetExtract(sheet))
@@ -32,7 +33,8 @@ def extract(filename):
 
 def save(sheets):
     for sheetName, rows in sheets.items():
-        scraperwiki.sqlite.save([], rows, table_name=sheetName)
+        if rows:
+            scraperwiki.sqlite.save([], rows, table_name=sheetName)
 
 def sheetExtract(sheet):
     """Extract a table from the sheet (xlrd.Sheet) and store it
@@ -70,8 +72,21 @@ def main(argv=None):
     if len(argv) > 1:
         filename = argv[1]
     if len(argv) != 2:
-        print >> sys.stderr, "Please supply exactly one argument"
+        raise ValueError("Please supply exactly one argument")
     save(extract(filename))
 
 if __name__ == '__main__':
-  main()
+    try:
+        main()
+    except Exception, e:
+        ret = {
+            'error': str(e),
+            'result': None
+        }
+        print json.dumps(ret)
+    else:
+        ret = {
+            'error': None,
+            'result': "success"
+        }
+        print json.dumps(ret)

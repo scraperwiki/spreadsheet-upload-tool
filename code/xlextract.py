@@ -19,14 +19,20 @@ except ImportError:
     pass
 
 def extract(filename):
-    """Do somethng with an Excel spreadsheet."""
+    """Do something with an Excel spreadsheet."""
 
+    sheets = dict()
     # :todo: consider providing encoding_override feature.
     book = xlrd.open_workbook(filename=filename)
     for sheetName in book.sheet_names():
-      sheet = book.sheet_by_name(sheetName)
-      rows = list(sheetExtract(sheet))
-      scraperwiki.sqlite.save([], rows, table_name=sheetName)
+        sheet = book.sheet_by_name(sheetName)
+        rows = list(sheetExtract(sheet))
+        sheets[sheetName] = rows
+    return sheets
+
+def save(sheets):
+    for sheetName, rows in sheets.items():
+        scraperwiki.sqlite.save([], rows, table_name=sheetName)
 
 def sheetExtract(sheet):
     """Extract a table from the sheet (xlrd.Sheet) and store it
@@ -62,7 +68,7 @@ def main(argv=None):
         filename = argv[1]
     if len(argv) != 2:
         print >> sys.stderr, "Please supply exactly one argument"
-    extract(filename)
+    save(extract(filename))
 
 if __name__ == '__main__':
   main()

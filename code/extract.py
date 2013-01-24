@@ -37,7 +37,7 @@ def extract(filename):
             sheets['swdata'] = [convertRow(r) for r in reader]
 
     else:
-        raise ValueError("Unknown file extension")
+        raise ValueError("Unknown file extension (I only understand .csv, .xls and .xlsx)")
 
     return sheets
 

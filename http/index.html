@@ -27,7 +27,7 @@
         $('#apikey').val settings.source.apikey
         $('input:submit').hide()
         $('#file').hide().on 'change', ->
-          path = $(@).val().replace("C:\\fakepath\\", "")
+          path = $(@)[0].files[0].name
           if path isnt ''
             $('#fake').addClass('loading disabled').html "Uploading #{path}&hellip;"
             $('input:submit').trigger 'click'

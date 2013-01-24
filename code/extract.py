@@ -7,6 +7,7 @@ and store it in a tabular database.
 
 import sys
 import json
+import csv
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -20,15 +21,24 @@ except ImportError:
     pass
 
 def extract(filename):
-    """Do something with an Excel spreadsheet."""
-
+    """Do something with a spreadsheet."""
     sheets = dict()
-    # :todo: consider providing encoding_override feature.
-    book = xlrd.open_workbook(filename=filename, logfile=sys.stderr)
-    for sheetName in book.sheet_names():
-        sheet = book.sheet_by_name(sheetName)
-        rows = list(sheetExtract(sheet))
-        sheets[sheetName] = rows
+    if filename.endswith( ('.xls', '.xlsx') ):
+        # :todo: consider providing encoding_override feature.
+        book = xlrd.open_workbook(filename=filename, logfile=sys.stderr)
+        for sheetName in book.sheet_names():
+            sheet = book.sheet_by_name(sheetName)
+            rows = list(sheetExtract(sheet))
+            sheets[sheetName] = rows
+    elif filename.endswith('.csv'):
+        with open(filename, 'r') as f:
+            data = f.read()
+            reader = csv.DictReader(data.splitlines())
+            sheets['swdata'] = [convertRow(r) for r in reader]
+
+    else:
+        raise ValueError("Unknown file extension")
+
     return sheets
 
 def save(sheets):
@@ -63,6 +73,19 @@ def sheetExtract(sheet):
             # ignore pairs with no header.
             d = Odict(((k,v) for k,v in zipped if k != ''))
             yield d
+
+def convertRow(row):
+    return dict([(k, convertField(cell)) for k,cell in row.items()])
+
+def convertField(string):
+    types = [ (int, int), (float, float) ]
+    for typ, test in types:
+        try:
+            return test(string)
+        except ValueError:
+            continue
+        else:
+            return string
 
 
 def main(argv=None):

@@ -15,16 +15,25 @@
   </head>
   <body>
     <form id="up" action="../../file/" method="POST" enctype="multipart/form-data">
-      <input type="file" name="file" size="80">
+      <input type="file" name="file" size="80" id="file">
       <input type="hidden" name="apikey" id="apikey">
       <input type="hidden" name="next" id="next">
-      <input type="submit" value="Upload now!" class="btn btn-primary">
+      <input type="submit" value="Upload now!">
     </form>
     <script type="text/coffeescript">
       $ ->
         settings = readSettings()
         $('#next').val "#{window.location.pathname}done.html#{window.location.hash}"
         $('#apikey').val settings.source.apikey
+        $('input:submit').hide()
+        $('#file').hide().on 'change', ->
+          path = $(@).val().replace("C:\\fakepath\\", "")
+          if path isnt ''
+            $('#fake').addClass('loading disabled').html "Uploading #{path}&hellip;"
+            $('input:submit').trigger 'click'
+        $('<a id="fake">').html('Select a file&hellip;').on('click', ->
+          $('#file').trigger 'click'
+        ).addClass('btn btn-primary').appendTo '#up'
     </script>
   </body>
 </html>

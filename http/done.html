@@ -22,7 +22,7 @@
         # If [level] is a truthful value, the alert is printed in red.
         level = level or 0
         $div = $("<div>").addClass("alert").text message
-        $div.append '<button type="button" class="close" data-dismiss="alert">×</button>'
+        $div.prepend '<button type="button" class="close" data-dismiss="alert">×</button>'
         $div.prepend "<strong>#{title}</strong> "
         $div.addClass("alert-error") if level
         $div.prependTo "body"

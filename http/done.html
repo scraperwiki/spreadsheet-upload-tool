@@ -29,7 +29,7 @@
 
       $ ->
         settings = readSettings()
-        exec("cd; python */code/xlextract.py ~/incoming/#{settings.filePath} 2>>extract.log")
+        exec("cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log")
           .done( (data) ->
             $('p.loading').remove()
             try

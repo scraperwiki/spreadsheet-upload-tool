@@ -4,10 +4,10 @@ sys.path.append('code')
 from nose.tools import assert_equals
 import scraperwiki
 
-import xlextract
+import extract
 
 def test_it_can_extract_a_tricky_xls_file():
-    sheets = xlextract.extract('fixture/deprivation-2010.xls')
+    sheets = extract.extract('fixture/deprivation-2010.xls')
     assert_equals(type(sheets), dict)
     assert_equals(len(sheets), 2) # TODO: this should be 1
 

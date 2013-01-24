@@ -4,13 +4,10 @@ sys.path.append('code')
 from nose.tools import assert_equals
 import scraperwiki
 
-import xlextract
-
-def setup():
-    pass
+import extract
 
 def test_it_can_extract_a_simple_xls_file():
-    sheets = xlextract.extract('fixture/simple.xls')
+    sheets = extract.extract('fixture/simple.xls')
     assert_equals(type(sheets), dict)
     assert_equals(len(sheets), 1)
 
@@ -21,7 +18,7 @@ def test_it_can_extract_a_simple_xls_file():
     assert_equals(row['Awesomeness'], 8)
 
 def test_it_can_extract_a_simple_xlsx_file():
-    sheets = xlextract.extract('fixture/simple.xlsx')
+    sheets = extract.extract('fixture/simple.xlsx')
     assert_equals(type(sheets), dict)
     assert_equals(len(sheets), 1)
 

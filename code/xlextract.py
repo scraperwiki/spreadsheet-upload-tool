@@ -48,7 +48,7 @@ def sheetExtract(sheet):
     header = None
     for r in range(rows):
         row = [sheet.cell_value(r, c) for c in range(cols)]
-        if ''.join(row) == '':
+        if all(x=='' for x in row):
             # if entire row is empty, skip to next row
             continue
         if not header:

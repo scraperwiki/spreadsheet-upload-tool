@@ -42,6 +42,9 @@ def sheetExtract(sheet):
     header = None
     for r in range(rows):
         row = [sheet.cell_value(r, c) for c in range(cols)]
+        if ''.join(row) == '':
+            # if entire row is empty, skip to next row
+            continue
         if not header:
             # number of non-blank cells in row
             nonblank = sum(x!='' for x in row)

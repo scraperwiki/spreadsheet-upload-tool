@@ -1,6 +1,0 @@
-#!/bin/sh
-
-cd
-mkdir -p incoming
-rm -r http
-ln -s ./$(dirname $0)/http http

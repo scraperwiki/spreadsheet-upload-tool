@@ -28,8 +28,9 @@
         $div.prependTo "body"
 
       $ ->
-        settings = readSettings()
-        exec("cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log")
+        settings = scraperwiki.readSettings()
+        scraperwiki.exec(
+          "cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log")
           .done( (data) ->
             $('p.loading').remove()
             try

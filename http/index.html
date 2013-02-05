@@ -22,7 +22,7 @@
     </form>
     <script type="text/coffeescript">
       $ ->
-        settings = readSettings()
+        settings = scraperwiki.readSettings()
         $('#next').val "#{window.location.pathname}done.html#{window.location.hash}"
         $('#apikey').val settings.source.apikey
         $('input:submit').hide()

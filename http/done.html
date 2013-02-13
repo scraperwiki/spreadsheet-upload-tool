@@ -41,7 +41,7 @@
               return false
           
             if obj.result?
-              scraperwiki.tool.redirect "/dataset/#{scraperwiki.boxName}"
+              scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
             else
               showAlert("Oh no!", "We received an error from the extraction script: #{obj.error}", 1)
               $('body').append("""<a href="index.html#{location.hash}" class="btn btn-primary">Try again!</a>""")

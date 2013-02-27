@@ -10,7 +10,7 @@
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
       <script src="http://x.scraperwiki.com/vendor/js/bootstrap.min.js"></script>
       <script src="http://coffeescript.org/extras/coffee-script.js"></script>
-      <script src="http://x.scraperwiki.com/js/custard.js"></script>
+      <script src="http://x.scraperwiki.com/js/scraperwiki.js"></script>
       <meta http-equiv="cleartype" content="on">
   </head>
   <body>
@@ -28,8 +28,9 @@
         $div.prependTo "body"
 
       $ ->
-        settings = readSettings()
-        exec("cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log")
+        settings = scraperwiki.readSettings()
+        scraperwiki.exec(
+          "cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log")
           .done( (data) ->
             $('p.loading').remove()
             try
@@ -40,8 +41,7 @@
               return false
           
             if obj.result?
-              $p = $('<p>').addClass('success').html('<b>Spreadsheet imported!</b> Please navigate to your dataset somehow. (Yes, this needs to be improved)')
-              $('body').append($p)
+              scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
             else
               showAlert("Oh no!", "We received an error from the extraction script: #{obj.error}", 1)
               $('body').append("""<a href="index.html#{location.hash}" class="btn btn-primary">Try again!</a>""")

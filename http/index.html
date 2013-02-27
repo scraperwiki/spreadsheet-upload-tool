@@ -10,7 +10,7 @@
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
       <script src="http://x.scraperwiki.com/vendor/js/bootstrap.min.js"></script>
       <script src="http://coffeescript.org/extras/coffee-script.js"></script>
-      <script src="http://x.scraperwiki.com/js/custard.js"></script>
+      <script src="http://x.scraperwiki.com/js/scraperwiki.js"></script>
       <meta http-equiv="cleartype" content="on">
   </head>
   <body>
@@ -22,7 +22,7 @@
     </form>
     <script type="text/coffeescript">
       $ ->
-        settings = readSettings()
+        settings = scraperwiki.readSettings()
         $('#next').val "#{window.location.pathname}done.html#{window.location.hash}"
         $('#apikey').val settings.source.apikey
         $('input:submit').hide()

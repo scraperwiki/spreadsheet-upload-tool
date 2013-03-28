@@ -32,7 +32,7 @@ def test_it_saves_to_the_database():
     sheets = extract.extract('fixture/simple.xlsx')
     extract.save(sheets)
 
-    data = scraperwiki.sqlite.select('* from Sheet1')
+    data = scraperwiki.sql.select('* from Sheet1')
     row = data[2]
     assert_equals(row['Year'], 2012)
     assert_equals(row['Awesomeness'], 8)

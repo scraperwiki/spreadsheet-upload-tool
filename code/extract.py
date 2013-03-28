@@ -44,7 +44,7 @@ def extract(filename):
 def save(sheets):
     for sheetName, rows in sheets.items():
         if rows:
-            scraperwiki.sqlite.save([], rows, table_name=sheetName)
+            scraperwiki.sql.save([], rows, table_name=sheetName)
 
 def sheetExtract(sheet):
     """Extract a table from the sheet (xlrd.Sheet) and store it

@@ -1,5 +1,5 @@
-Year,Awesomeness
-2010,9
-2011,10
-2012,8
-2013,11
+Year,Awesomeness,Weather
+2010,9,cold
+2011,10,cold
+2012,8,rainy
+2013,11,cold

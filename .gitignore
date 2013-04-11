@@ -1,2 +1,9 @@
+*.pyc
+bin/
+build/
+include/
+lib/
+local/
+man/
 .swotconfig
 scraperwiki.sqlite

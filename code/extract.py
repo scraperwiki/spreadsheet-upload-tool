@@ -83,9 +83,8 @@ def convertField(string):
         try:
             return test(string)
         except ValueError:
-            continue
-        else:
-            return string
+            pass
+    return string
 
 
 def main(argv=None):

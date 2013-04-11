@@ -2,7 +2,6 @@ import sys
 sys.path.append('code')
 
 from nose.tools import assert_equals
-import scraperwiki
 
 import extract
 

@@ -2,7 +2,6 @@ import sys
 sys.path.append('code')
 
 from nose.tools import *
-import scraperwiki
 
 import extract
 

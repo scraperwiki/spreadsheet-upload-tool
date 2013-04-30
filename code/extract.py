@@ -20,15 +20,17 @@ try:
 except ImportError:
     pass
 
-def extract(filename):
+def extract(filename, verbose=False):
     """Do something with a spreadsheet."""
     sheets = dict()
     if filename.endswith( ('.xls', '.xlsx') ):
         # :todo: consider providing encoding_override feature.
         book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
         for sheetName in book.sheet_names():
+            if verbose:
+                print >>sys.stderr, "--- extracting sheet:", sheetName
             sheet = book.sheet_by_name(sheetName)
-            rows = list(sheetExtract(sheet))
+            rows = list(sheetExtract(sheet, verbose))
             sheets[sheetName] = rows
     elif filename.endswith('.csv'):
         with open(filename, 'r') as f:
@@ -46,7 +48,7 @@ def save(sheets):
         if rows:
             scraperwiki.sql.save([], rows, table_name=sheetName)
 
-def sheetExtract(sheet):
+def sheetExtract(sheet, verbose=False):
     """Extract a table from the sheet (xlrd.Sheet) and store it
     in a sqlite database using the scraperwiki module.
 
@@ -60,15 +62,28 @@ def sheetExtract(sheet):
     header = None
     for r in range(rows):
         row = [sheet.cell_value(r, c) for c in range(cols)]
+        if verbose:
+            print >>sys.stderr, "row:", row
         if all(x=='' for x in row):
             # if entire row is empty, skip to next row
+            if verbose:
+                print >>sys.stderr, "...skipping entirely empty row"
             continue
         if not header:
             # number of non-blank cells in row
             nonblank = sum(x!='' for x in row)
-            if nonblank > 0.9*cols:
+            if verbose:
+                print >>sys.stderr, "...nonblank:", nonblank, "cols", cols
+            if nonblank > 0.8*cols:
+                if verbose:
+                    print >>sys.stderr, "...non-blank greater than 90%, using as header"
                 header = convertItemsToStrings(row)
+            else:
+                if verbose:
+                    print >>sys.stderr, "...too many empty cells, not using as header"
         else:
+            if verbose:
+                print >>sys.stderr, "...using as body"
             zipped = zip(header, row)
             # ignore pairs with no header.
             d = Odict(((k,v) for k,v in zipped if k != ''))

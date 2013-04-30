@@ -25,7 +25,7 @@ def extract(filename):
     sheets = dict()
     if filename.endswith( ('.xls', '.xlsx') ):
         # :todo: consider providing encoding_override feature.
-        book = xlrd.open_workbook(filename=filename, logfile=sys.stderr)
+        book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
         for sheetName in book.sheet_names():
             sheet = book.sheet_by_name(sheetName)
             rows = list(sheetExtract(sheet))

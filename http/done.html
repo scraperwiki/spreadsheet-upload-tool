@@ -40,19 +40,19 @@
               obj = JSON.parse(data)
             catch error
               showAlert("Unexpected output returned from extraction script", error, 1)
-              $('body').append("""<a href="index.html#{location.hash}" class="btn btn-primary">Try again!</a>""")
+              $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
               return false
           
             if obj.result?
               scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
             else
               showAlert("Oh no!", "We received an error from the extraction script: #{obj.error}", 1)
-              $('body').append("""<a href="index.html#{location.hash}" class="btn btn-primary">Try again!</a>""")
+              $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
 
           ).fail( (jqXHR, textStatus, errorThrown) ->
             $('p.loading').remove()
             showAlert("Failed to contact box server", errorThrown, 1)
-            $('body').append("""<a href="index.html#{location.hash}" class="btn btn-primary">Try again!</a>""")
+            $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
           )
 
     </script>

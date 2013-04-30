@@ -67,12 +67,18 @@ def sheetExtract(sheet):
             # number of non-blank cells in row
             nonblank = sum(x!='' for x in row)
             if nonblank > 0.9*cols:
-                header = row
+                header = convertItemsToStrings(row)
         else:
             zipped = zip(header, row)
             # ignore pairs with no header.
             d = Odict(((k,v) for k,v in zipped if k != ''))
             yield d
+
+def convertItemsToStrings(row):
+    # Turns items in the list "row" to strings.
+    # Useful for avoiding column headers that are integers or floats.
+    # return [ unicode(item) for item in row ]
+    return row
 
 def convertRow(row):
     return dict([(k, convertField(cell)) for k,cell in row.items()])

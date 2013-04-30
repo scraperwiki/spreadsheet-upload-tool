@@ -17,3 +17,10 @@ def test_it_attempts_to_extract_an_evil_xlsx_file():
     assert_equals(row['Staff Group'], 'All HCHS doctors (incl locums)')
     assert_equals(row['12 month period ending March 2012'], 58226.66)
 
+
+
+def test_it_correctly_detects_the_header_row_in_a_complicated_file():
+    sheets = extract.extract('fixture/qep211.xls')
+
+    sheet = sheets['Annual']
+    assert_equals(sheet[0][u'ANNUAL FIGURES'], 1970)

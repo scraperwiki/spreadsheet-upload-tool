@@ -1,9 +1,12 @@
 import sys
 sys.path.append('code')
+import os
 
 from nose.tools import assert_equals
 
 import extract
+
+import scraperwiki
 
 def test_it_attempts_to_extract_an_evil_xlsx_file():
     sheets = extract.extract('fixture/nhs-staff-2012.xlsx')
@@ -24,3 +27,10 @@ def test_it_correctly_detects_the_header_row_in_a_complicated_file():
 
     sheet = sheets['Annual']
     assert_equals(sheet[0][u'ANNUAL FIGURES'], 1970)
+    
+    tmpname = "/tmp/spreadsheet-upload-tool-evil-test.sqlite"
+    if os.path.isfile(tmpname):
+        os.remove(tmpname)
+    scraperwiki.sqlite._connect(tmpname)
+    extract.save(sheets)
+

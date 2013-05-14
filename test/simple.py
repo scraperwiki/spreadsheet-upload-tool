@@ -49,5 +49,5 @@ def test_it_can_extract_a_simple_csv_file():
     assert_equals(row['Awesomeness'], 8)
 
 @raises(ValueError)
-def test_it_errors_for_unknown_extensions():
-    extract.extract('fixture/simple.bloop')
+def test_it_errors_for_unknown_filetypes():
+    extract.extract('fixture/tractor.png')

@@ -11,6 +11,8 @@ import csv
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
+# https://github.com/ahupp/python-magic
+import magic
 # https://github.com/scraperwiki/scraperwiki_local
 import scraperwiki
 
@@ -20,10 +22,36 @@ try:
 except ImportError:
     pass
 
+
+def main(argv=None):
+    import sys
+    if argv is None:
+        argv = sys.argv
+    if len(argv) > 1:
+        filename = argv[1]
+    if len(argv) != 2:
+        raise ValueError("Please supply exactly one argument")
+    save(extract(filename))
+
+
+def detectType(filename):
+    # detects the filetype of a given file
+    # possible output values are: "xls", "xlsx", "csv", or other
+    rawFileType = magic.from_file(filename)
+    if rawFileType == 'ASCII text':
+        return 'csv'
+    elif rawFileType == 'Microsoft Excel 2007+':
+        return 'xlsx'
+    elif 'Excel' in rawFileType:
+        return 'xls'
+    else:
+        return rawFileType
+
+
 def extract(filename, verbose=False):
     """Do something with a spreadsheet."""
     sheets = dict()
-    if filename.endswith( ('.xls', '.xlsx') ):
+    if detectType(filename) in ['xls', 'xlsx']:
         # :todo: consider providing encoding_override feature.
         book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
         for sheetName in book.sheet_names():
@@ -32,21 +60,23 @@ def extract(filename, verbose=False):
             sheet = book.sheet_by_name(sheetName)
             rows = list(sheetExtract(sheet, verbose))
             sheets[sheetName] = rows
-    elif filename.endswith('.csv'):
+    elif detectType(filename) == 'csv':
         with open(filename, 'r') as f:
             data = f.read()
             reader = csv.DictReader(data.splitlines())
             sheets['swdata'] = [convertRow(r) for r in reader]
 
     else:
-        raise ValueError("Unknown file extension (I only understand .csv, .xls and .xlsx)")
+        raise ValueError("Unknown file type (I only understand .csv, .xls and .xlsx)")
 
     return sheets
+
 
 def save(sheets):
     for sheetName, rows in sheets.items():
         if rows:
             scraperwiki.sql.save([], rows, table_name=sheetName)
+
 
 def sheetExtract(sheet, verbose=False):
     """Extract a table from the sheet (xlrd.Sheet) and store it
@@ -89,14 +119,17 @@ def sheetExtract(sheet, verbose=False):
             d = Odict(((k,v) for k,v in zipped if k != ''))
             yield d
 
+
 def convertItemsToStrings(row):
     # Turns items in the list "row" to strings.
     # Useful for avoiding column headers that are integers or floats.
     # return [ unicode(item) for item in row ]
     return row
 
+
 def convertRow(row):
     return dict([(k, convertField(cell)) for k,cell in row.items()])
+
 
 def convertField(string):
     types = [ (int, int), (float, float) ]
@@ -108,26 +141,18 @@ def convertField(string):
     return string
 
 
-def main(argv=None):
-    import sys
-    if argv is None:
-        argv = sys.argv
-    if len(argv) > 1:
-        filename = argv[1]
-    if len(argv) != 2:
-        raise ValueError("Please supply exactly one argument")
-    save(extract(filename))
-
 if __name__ == '__main__':
     try:
         main()
     except Exception, e:
+        # catch errors and wrap as JSON for frontend to display
         ret = {
             'error': str(e),
             'result': None
         }
         print json.dumps(ret)
     else:
+        # return success as JSON for frontend to display
         ret = {
             'error': None,
             'result': "success"

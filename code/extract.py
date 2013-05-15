@@ -50,23 +50,35 @@ def detectType(filename):
         return rawFileType
 
 
+def validateHeaders(rows):
+    """Checks "rows" starts with a valid header row.
+    rows should be a list of strings/integers/floats
+    Will raise an error if:
+    * the first row isn't the widest
+    * the first row contains empty cells
+    """
+    pass
+
 def extract(filename, verbose=False):
     """Do something with a spreadsheet."""
     sheets = dict()
     if detectType(filename) in ['xls', 'xlsx']:
-        # :todo: consider providing encoding_override feature.
         book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
         for sheetName in book.sheet_names():
             if verbose:
                 print >>sys.stderr, "--- extracting sheet:", sheetName
             sheet = book.sheet_by_name(sheetName)
+            validateHeaders(sheet)
             rows = list(sheetExtract(sheet, verbose))
             sheets[sheetName] = rows
     elif detectType(filename) == 'csv':
         with open(filename, 'r') as f:
             data = f.read()
-            reader = csv.DictReader(data.splitlines())
-            sheets['swdata'] = [convertRow(r) for r in reader]
+            sheet = data.splitlines()
+            validateHeaders(sheet)
+            reader = csv.DictReader(sheet)
+            rows = [convertRow(r) for r in reader]
+            sheets['swdata'] = rows
 
     else:
         raise ValueError("Unknown file type (I only understand .csv, .xls and .xlsx)")
@@ -81,13 +93,7 @@ def save(sheets):
 
 
 def sheetExtract(sheet, verbose=False):
-    """Extract a table from the sheet (xlrd.Sheet) and store it
-    in a sqlite database using the scraperwiki module.
-
-    There are all sorts of complicated things to do with which
-    rectangular section it extracts for the table, and what the
-    headers end up being.
-    """
+    """Extract a table from the sheet (xlrd.Sheet)"""
 
     rows = sheet.nrows
     cols = sheet.ncols

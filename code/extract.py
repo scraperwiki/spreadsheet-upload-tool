@@ -79,7 +79,11 @@ def validateHeaders(rows):
     * the first row isn't the widest
     * the first row contains empty cells
     """
-    pass
+    rowLengths = [ len(row) for row in rows[1:] ]
+    print rowLengths
+    print len(rows[1]), max(rowLengths)
+    if len(rows[1]) < max(rowLengths):
+        raise TypeError("Your header row isn't the widest in the table")
 
 
 def validateConsistency(dictRows):
@@ -93,16 +97,15 @@ def extractExcel(filename):
 
     workbook = []
     sheetNames = []
-    book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
+    book = xlrd.open_workbook(filename=filename, ragged_rows=True, logfile=sys.stderr, verbosity=0)
 
     for sheetName in book.sheet_names():
         sheetNames.append(sheetName)
         excelSheet = book.sheet_by_name(sheetName)
         nrows = excelSheet.nrows
-        ncols = excelSheet.ncols
         sheet = []
-        for r in range(nrows):
-            row = [ excelSheet.cell_value(r, c) for c in range(ncols) ]
+        for rowx in range(nrows):
+            row = excelSheet.row_values(rowx)
             sheet.append(row)
         workbook.append(sheet)
 

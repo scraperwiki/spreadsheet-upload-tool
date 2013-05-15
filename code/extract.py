@@ -148,10 +148,10 @@ def save(sheets):
 
 
 def convertField(string):
-    types = [ (int, int), (float, float) ]
-    for typ, test in types:
+    types = [ int, float ]
+    for t in types:
         try:
-            return test(string)
+            return t(string)
         except ValueError:
             pass
     return string

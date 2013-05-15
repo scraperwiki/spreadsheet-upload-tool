@@ -22,6 +22,10 @@ def test_it_detects_a_random_file():
     filetype = extract.detectType('fixture/tractor.png')
     assert filetype not in ['csv', 'xls', 'xlsx']
 
+def test_it_detects_an_xlsx_file_that_shows_up_as_a_zip_archive_for_some_reason():
+    filetype = extract.detectType('fixture/temperature.xlsx')
+    assert_equals(filetype, 'xlsx')
+
 def test_it_detects_a_csv_file_with_an_xls_extension():
     filetype = extract.detectType('fixture/really-a-csv.xls')
     assert_equals(filetype, 'csv')

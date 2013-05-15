@@ -44,6 +44,8 @@ def detectType(filename):
         return 'xlsx'
     elif 'Excel' in rawFileType:
         return 'xls'
+    elif 'Zip archive' in rawFileType and filename.endswith('.xlsx'):
+        return 'xlsx'
     else:
         return rawFileType
 

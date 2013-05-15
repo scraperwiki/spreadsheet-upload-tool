@@ -17,7 +17,7 @@ import magic
 # https://github.com/scraperwiki/scraperwiki_local
 import scraperwiki
 
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 
 
 def main(argv=None):
@@ -86,9 +86,22 @@ def validateHeaders(rows):
         raise TypeError("Your header row isn't the widest in the table")
 
 
-def validateConsistency(dictRows):
-    """Checks each value in the list of dicts is of a consistent type"""
-    pass
+def validateConsistency(dictRows, precision=0.8):
+    """Checks each value in the list of dicts is of a consistent type.
+    If a column is more than [precision]% one type, it must be entirely that type.
+    """
+
+    headers = dictRows[0].keys()
+
+    for column in headers:
+        types = [humanType(dictRow[column]) for dictRow in dictRows]
+        typesInThisColumn = Counter(types)
+        totalNonEmptyCells = sum(typesInThisColumn.values()) - typesInThisColumn.get('empty', 0)
+
+        for t, frequency in typesInThisColumn.iteritems():
+            # if [precision] percent of cells are of this type, they should *all* be of this type
+            if precision * totalNonEmptyCells < frequency < totalNonEmptyCells:
+                raise TypeError("The column '%s' is not of a consistent data type" % column)
 
 
 def extractExcel(filename):
@@ -158,6 +171,24 @@ def convertField(string):
         except ValueError:
             pass
     return string
+
+
+def humanType(thing):
+    t = type(thing).__name__
+    types = {
+        "int": "number",
+        "float": "number",
+        "long": "number",
+        "NoneType": "empty",
+        "str": "string",
+        "unicode": "string"
+    }
+    if thing == '':
+        return "empty"
+    elif t in types:
+        return types[t]
+    else:
+        return t
 
 
 if __name__ == '__main__':

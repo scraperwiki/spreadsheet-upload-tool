@@ -8,6 +8,7 @@ and store it in a tabular database.
 import sys
 import json
 import csv
+import sys
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -16,15 +17,10 @@ import magic
 # https://github.com/scraperwiki/scraperwiki_local
 import scraperwiki
 
-Odict = dict
-try:
-    from collections import OrderedDict as Odict
-except ImportError:
-    pass
+from collections import OrderedDict
 
 
 def main(argv=None):
-    import sys
     if argv is None:
         argv = sys.argv
     if len(argv) > 1:
@@ -34,9 +30,35 @@ def main(argv=None):
     save(extract(filename))
 
 
+def extract(filename, verbose=False):
+    """Convert a file into a list (workbook) of lists (sheets) of lists (rows)
+    and then perform checks, and if all is ok, return dicts for saving to SQLite"""
+
+    fileType = detectType(filename)
+    if fileType not in ['xls', 'xlsx', 'csv']:
+        raise ValueError("Unknown file type (I only understand .csv, .xls and .xlsx)")
+
+    if fileType == 'csv':
+        workbook, sheetNames = extractCSV(filename)
+    else:
+        workbook, sheetNames = extractExcel(filename)
+
+    for sheet in workbook:
+        validateHeaders(sheet)
+
+    # sheets will be added to this dict,
+    # as lists of dicts (rather than lists of lists)
+    workbookForSQL = convertToOrderedDicts(workbook, sheetNames)
+
+    for sheet in workbookForSQL:
+        validateConsistency(sheet)
+
+    return workbookForSQL
+
+
 def detectType(filename):
-    # detects the filetype of a given file
-    # possible output values are: "xls", "xlsx", "csv", or other
+    """Detects the filetype of a given file.
+    Possible output values are: "xls", "xlsx", "csv", or something unexpected"""
     rawFileType = magic.from_file(filename)
     if rawFileType == 'ASCII text':
         return 'csv'
@@ -59,84 +81,70 @@ def validateHeaders(rows):
     """
     pass
 
-def extract(filename, verbose=False):
-    """Do something with a spreadsheet."""
-    sheets = dict()
-    if detectType(filename) in ['xls', 'xlsx']:
-        book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
-        for sheetName in book.sheet_names():
-            if verbose:
-                print >>sys.stderr, "--- extracting sheet:", sheetName
-            sheet = book.sheet_by_name(sheetName)
-            validateHeaders(sheet)
-            rows = list(sheetExtract(sheet, verbose))
-            sheets[sheetName] = rows
-    elif detectType(filename) == 'csv':
-        with open(filename, 'r') as f:
-            data = f.read()
-            sheet = data.splitlines()
-            validateHeaders(sheet)
-            reader = csv.DictReader(sheet)
-            rows = [convertRow(r) for r in reader]
-            sheets['swdata'] = rows
 
-    else:
-        raise ValueError("Unknown file type (I only understand .csv, .xls and .xlsx)")
+def validateConsistency(dictRows):
+    """Checks each value in the list of dicts is of a consistent type"""
+    pass
 
-    return sheets
+
+def extractExcel(filename):
+    """Takes an excel file location, turns it into a
+    list (workbook) of lists (sheets) of lists (rows)"""
+
+    workbook = []
+    sheetNames = []
+    book = xlrd.open_workbook(filename=filename, logfile=sys.stderr, verbosity=0)
+
+    for sheetName in book.sheet_names():
+        sheetNames.append(sheetName)
+        excelSheet = book.sheet_by_name(sheetName)
+        nrows = excelSheet.nrows
+        ncols = excelSheet.ncols
+        sheet = []
+        for r in range(nrows):
+            row = [ excelSheet.cell_value(r, c) for c in range(ncols) ]
+            sheet.append(row)
+        workbook.append(sheet)
+
+    return workbook, sheetNames
+
+
+def extractCSV(filename):
+    """Takes a csv file location, turns it into a
+    list with one item which is a list (sheet) of lists (rows)"""
+
+    workbook = []
+    sheetNames = ['swdata']
+    with open(filename, 'r') as f:
+        sheet = []
+        for row in csv.reader(f):
+            typeConvertedRow = [ convertField(cell) for cell in row ]
+            sheet.append(typeConvertedRow)
+        workbook.append(sheet)
+
+    return workbook, sheetNames
+
+
+def convertToOrderedDicts(workbook, sheetNames):
+    """Converts a list (workbook) of lists (sheets) of lists (rows) and
+    a list of sheetNames, into a dict (workbookForSQL) of lists (sheets) of dicts (rows)"""
+    workbookForSQL = OrderedDict()
+    
+    for sheet, sheetName in zip(workbook, sheetNames):
+        sheetForSQL = []
+        headers = sheet[0]
+        for row in sheet[1:]:
+            rowForSQL = OrderedDict( zip(headers, row) )
+            sheetForSQL.append(rowForSQL)
+        workbookForSQL[sheetName] = sheetForSQL
+
+    return workbookForSQL
 
 
 def save(sheets):
     for sheetName, rows in sheets.items():
         if rows:
             scraperwiki.sql.save([], rows, table_name=sheetName)
-
-
-def sheetExtract(sheet, verbose=False):
-    """Extract a table from the sheet (xlrd.Sheet)"""
-
-    rows = sheet.nrows
-    cols = sheet.ncols
-    header = None
-    for r in range(rows):
-        row = [sheet.cell_value(r, c) for c in range(cols)]
-        if verbose:
-            print >>sys.stderr, "row:", row
-        if all(x=='' for x in row):
-            # if entire row is empty, skip to next row
-            if verbose:
-                print >>sys.stderr, "...skipping entirely empty row"
-            continue
-        if not header:
-            # number of non-blank cells in row
-            nonblank = sum(x!='' for x in row)
-            if verbose:
-                print >>sys.stderr, "...nonblank:", nonblank, "cols", cols
-            if nonblank > 0.8*cols:
-                if verbose:
-                    print >>sys.stderr, "...non-blank greater than 90%, using as header"
-                header = convertItemsToStrings(row)
-            else:
-                if verbose:
-                    print >>sys.stderr, "...too many empty cells, not using as header"
-        else:
-            if verbose:
-                print >>sys.stderr, "...using as body"
-            zipped = zip(header, row)
-            # ignore pairs with no header.
-            d = Odict(((k,v) for k,v in zipped if k != ''))
-            yield d
-
-
-def convertItemsToStrings(row):
-    # Turns items in the list "row" to strings.
-    # Useful for avoiding column headers that are integers or floats.
-    # return [ unicode(item) for item in row ]
-    return row
-
-
-def convertRow(row):
-    return dict([(k, convertField(cell)) for k,cell in row.items()])
 
 
 def convertField(string):

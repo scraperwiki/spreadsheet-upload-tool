@@ -94,6 +94,9 @@ def validateHeaders(rows):
     if len(rows[0]) < max(rowLengths):
         raise HeaderWidthError("Your header row isn't the widest in the table")
 
+    if None in rows[0] or "" in rows[0]:
+        raise NullHeaderError("Your header row contains empty cells")
+
 
 def validateConsistency(dictRows, precision=0.8):
     """Checks each (non-empty) value in the list of dicts is of a consistent type.
@@ -142,7 +145,8 @@ def extractCSV(filename):
     sheetNames = ['swdata']
     with open(filename, 'r') as f:
         sheet = []
-        for row in csv.reader(f):
+        # we could use strict=True here too but may produce too many errors
+        for row in csv.reader(f, skipinitialspace=True):
             typeConvertedRow = [ convertField(cell) for cell in row ]
             sheet.append(typeConvertedRow)
         workbook.append(sheet)

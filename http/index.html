@@ -41,7 +41,7 @@ $('#apikey').val settings.source.apikey
 $('input:submit').hide()
 $('<a id="fake">').html('Select a file&hellip;').on('click', ->
   $('#file').trigger 'click'
-).addClass('btn btn-primary').appendTo '#up'
+).addClass('btn btn-primary btn-large').appendTo '#up'
 $('#file').hide().on('change', startFileUpload)
 
     </script>

@@ -19,6 +19,13 @@ import scraperwiki
 
 from collections import OrderedDict, Counter
 
+class HeaderError(Exception):
+    pass
+
+
+class ConsistencyError(Exception):
+    pass
+
 
 def main(argv=None):
     if argv is None:
@@ -81,7 +88,7 @@ def validateHeaders(rows):
     """
     rowLengths = [ len(row) for row in rows[1:] ]
     if len(rows[0]) < max(rowLengths):
-        raise TypeError("Your header row isn't the widest in the table")
+        raise HeaderError("Your header row isn't the widest in the table")
 
 
 def validateConsistency(dictRows, precision=0.8):
@@ -99,7 +106,7 @@ def validateConsistency(dictRows, precision=0.8):
         for t, frequency in typesInThisColumn.iteritems():
             # if [precision] percent of cells are of this type, they should *all* be of this type
             if precision * totalNonEmptyCells < frequency < totalNonEmptyCells:
-                raise TypeError("The column '%s' is not of a consistent data type" % column)
+                raise ConsistencyError("The column '%s' is not of a consistent data type" % column)
 
 
 def extractExcel(filename):

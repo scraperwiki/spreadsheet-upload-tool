@@ -9,7 +9,7 @@ import random
 
 import extract
 
-@raises(TypeError)
+@raises(extract.ConsistencyError)
 def test_it_raises_error_when_column_types_are_not_consistent():
     # construct a single-column table, with a "lat" column
     # which is 80% floats, 10% strings and 10% empty

@@ -80,14 +80,12 @@ def validateHeaders(rows):
     * the first row contains empty cells
     """
     rowLengths = [ len(row) for row in rows[1:] ]
-    print rowLengths
-    print len(rows[1]), max(rowLengths)
-    if len(rows[1]) < max(rowLengths):
+    if len(rows[0]) < max(rowLengths):
         raise TypeError("Your header row isn't the widest in the table")
 
 
 def validateConsistency(dictRows, precision=0.8):
-    """Checks each value in the list of dicts is of a consistent type.
+    """Checks each (non-empty) value in the list of dicts is of a consistent type.
     If a column is more than [precision]% one type, it must be entirely that type.
     """
 

@@ -19,17 +19,6 @@
   <body>
     <p class="loading">Structuring your data&hellip;</p>
     <script type="text/coffeescript">
-
-      showAlert = (title, message, level) ->
-        # [title] and [message] should be html strings. The first is displayed in bold.
-        # If [level] is a truthful value, the alert is printed in red.
-        level = level or 0
-        $div = $("<div>").addClass("alert").text message
-        $div.prepend '<button type="button" class="close" data-dismiss="alert">×</button>'
-        $div.prepend "<strong>#{title}</strong> "
-        $div.addClass("alert-error") if level
-        $div.prependTo "body"
-
       $ ->
         settings = scraperwiki.readSettings()
         scraperwiki.exec(
@@ -39,19 +28,19 @@
             try
               obj = JSON.parse(data)
             catch error
-              showAlert("Unexpected output returned from extraction script", error, 1)
+              scraperwiki.alert("Unexpected output returned from extraction script", error, 1)
               $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
               return false
           
             if obj.result?
               scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
             else
-              showAlert("Oh no!", "We received an error from the extraction script: #{obj.error}", 1)
+              scraperwiki.alert("Oh no!", "We received an error from the extraction script: #{obj.error}", 1)
               $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
 
           ).fail( (jqXHR, textStatus, errorThrown) ->
             $('p.loading').remove()
-            showAlert("Failed to contact box server", errorThrown, 1)
+            scraperwiki.alert("Failed to contact box server", errorThrown, 1)
             $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
           )
 

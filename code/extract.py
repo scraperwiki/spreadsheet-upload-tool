@@ -50,8 +50,8 @@ def extract(filename, verbose=False):
     # as lists of dicts (rather than lists of lists)
     workbookForSQL = convertToOrderedDicts(workbook, sheetNames)
 
-    for sheet in workbookForSQL:
-        validateConsistency(sheet)
+    for sheetName, sheetData in workbookForSQL.iteritems():
+        validateConsistency(sheetData)
 
     return workbookForSQL
 

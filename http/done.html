@@ -19,32 +19,32 @@
   <body>
     <p class="loading">Structuring your data&hellip;</p>
     <script type="text/coffeescript">
-      $ ->
-        settings = scraperwiki.readSettings()
-        scraperwiki.exec(
-          "cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log")
-          .done( (data) ->
-            $('p.loading').remove()
-            try
-              obj = JSON.parse(data)
-            catch error
-              scraperwiki.alert("Unexpected output returned from extraction script", error, 1)
-              $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
-              return false
 
-            if obj.errorType?
-              scraperwiki.alert("Oh no!", "We received an error from the extraction script: #{obj.errorMessage}", 1)
-              $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
-            else
-              scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
+handleExecOutput = (output) ->
+  try
+    obj = JSON.parse(data)
+  catch error
+    scraperwiki.alert("Unexpected output returned from extraction script", error, 1)
+    $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
+    $('p.loading').remove()
+    return false
 
-          ).fail( (jqXHR, textStatus, errorThrown) ->
-            $('p.loading').remove()
-            scraperwiki.alert("Failed to contact box server", errorThrown, 1)
-            $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
-          )
+  if obj.errorType?
+    scraperwiki.alert("Oh no!", "We received an error from the extraction script: #{obj.errorMessage}", 1)
+    $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
+    $('p.loading').remove()
+  else
+    scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
+
+handleExecFailure = (jqXHR, textStatus, errorThrown) ->
+  $('p.loading').remove()
+  scraperwiki.alert("Failed to contact box server", errorThrown, 1)
+  $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
+
+settings = scraperwiki.readSettings()
+cmd = "cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log"
+scraperwiki.exec(cmd).done(handleExecOutput).fail(handleExecFailure)
 
     </script>
   </body>
 </html>
-

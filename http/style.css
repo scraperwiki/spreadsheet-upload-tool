@@ -10,3 +10,10 @@ p.loading {
     font-size: 20px;
 }
 
+div.error {
+  display: none;
+}
+
+#tryAgain {
+  display: none;
+}

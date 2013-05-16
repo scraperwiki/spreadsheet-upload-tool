@@ -18,6 +18,23 @@
   </head>
   <body>
     <p class="loading">Structuring your data&hellip;</p>
+    <div class="error" id="HeaderWidthError">
+      <h1>It looks like your spreadsheet&rsquo;s header row doesn&rsquo;t cover every column of data</h1>
+      <p>To fix this problem, load your spreadsheet into Excel, and ensure that the header row contains a label for each column of data. Pay particular attention to columns on the right-hand side of your table.</p>
+      <img src="http://placekitten.com/g/200/300" />
+    </div>
+    <div class="error" id="NullHeaderError">
+      <h1>It looks like one or more of your spreadsheet&rsquo;s columns are missing a header</h1>
+      <p>To fix this problem, load your spreadsheet into Excel, and ensure that the header row contains a label for each column of data.</p>
+      <img src="http://placekitten.com/g/200/300" />
+    </div>
+    <div class="error" id="ConsistencyError">
+      <h1>One or more of your spreadsheet&rsquo;s columns contain inconsistent data types</h1>
+      <p>This means that, for example, there are a few text entries in a column of numbers.</p>
+      <p>To fix this problem, load your spreadsheet into Excel, and ensure that there is no unexpected text in a mumeric column or vice versa.</p>
+      <img src="http://placekitten.com/g/200/300" />
+    </div>
+    <a id="tryAgain" class="btn btn-primary"><i class="icon-refresh space"></i> Try again!</a>
     <script type="text/coffeescript">
 
 handleExecOutput = (output) ->
@@ -25,25 +42,29 @@ handleExecOutput = (output) ->
     obj = JSON.parse(output)
   catch error
     scraperwiki.alert("Unexpected output returned from extraction script", error, 1)
-    $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
     $('p.loading').remove()
+    $('#tryAgain').show()
     return false
 
   if obj.errorType?
-    scraperwiki.alert("Oh no!", "We received an error from the extraction script: #{obj.errorMessage}", 1)
-    $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
     $('p.loading').remove()
+    $('#tryAgain').show()
+    # see if we have a canned response for this errorType
+    if $("##{obj.errorType}").length
+      $("##{obj.errorType}").show()
+    else
+      scraperwiki.alert("Oh no!", "We received an unexpected error while structuring your spreadsheet: <code>#{obj.errorType} #{obj.errorMessage}</code>", 1)
   else
     scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
 
 handleExecFailure = (jqXHR, textStatus, errorThrown) ->
   $('p.loading').remove()
+  $('#tryAgain').show()
   scraperwiki.alert("Failed to contact box server", errorThrown, 1)
-  $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")
 
-settings = scraperwiki.readSettings()
-cmd = "cd; python */code/extract.py ~/incoming/#{settings.filePath} 2>>extract.log"
+cmd = "cd; python */code/extract.py ~/incoming/#{scraperwiki.readSettings().filePath} 2>>extract.log"
 scraperwiki.exec(cmd).done(handleExecOutput).fail(handleExecFailure)
+$('#tryAgain').attr('href', "./#{location.hash}")
 
     </script>
   </body>

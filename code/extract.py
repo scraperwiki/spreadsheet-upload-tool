@@ -32,13 +32,33 @@ class ConsistencyError(Exception):
 
 
 def main(argv=None):
-    if argv is None:
-        argv = sys.argv
-    if len(argv) > 1:
-        filename = argv[1]
-    if len(argv) != 2:
-        raise ValueError("Please supply exactly one argument")
-    save(extract(filename))
+    try:
+        if argv is None:
+            argv = sys.argv
+        if len(argv) > 1:
+            filename = argv[1]
+        if len(argv) != 2:
+            raise ValueError("Please supply exactly one argument")
+        save(extract(filename))
+
+    except Exception, e:
+        # catch errors and wrap as JSON for frontend to display
+        print type(e).__name__
+        ret = {
+            'errorType': type(e).__name__,
+            'error': str(e),
+            'result': None
+        }
+        return json.dumps(ret)
+
+    else:
+        # return success as JSON for frontend to display
+        ret = {
+            'errorType': None,
+            'error': None,
+            'result': "success"
+        }
+        return json.dumps(ret)
 
 
 def extract(filename, verbose=False):
@@ -205,19 +225,5 @@ def humanType(thing):
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception, e:
-        # catch errors and wrap as JSON for frontend to display
-        ret = {
-            'error': str(e),
-            'result': None
-        }
-        print json.dumps(ret)
-    else:
-        # return success as JSON for frontend to display
-        ret = {
-            'error': None,
-            'result': "success"
-        }
-        print json.dumps(ret)
+    print main()
+    

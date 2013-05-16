@@ -46,8 +46,7 @@ def main(argv=None):
         print type(e).__name__
         ret = {
             'errorType': type(e).__name__,
-            'error': str(e),
-            'result': None
+            'errorMessage': str(e)
         }
         return json.dumps(ret)
 
@@ -55,8 +54,7 @@ def main(argv=None):
         # return success as JSON for frontend to display
         ret = {
             'errorType': None,
-            'error': None,
-            'result': "success"
+            'errorMessage': None
         }
         return json.dumps(ret)
 

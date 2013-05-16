@@ -24,19 +24,26 @@
       <input type="submit" value="Upload now!">
     </form>
     <script type="text/coffeescript">
-      $ ->
-        settings = scraperwiki.readSettings()
-        $('#next').val "#{window.location.pathname}done.html#{window.location.hash}"
-        $('#apikey').val settings.source.apikey
-        $('input:submit').hide()
-        $('#file').hide().on 'change', ->
-          path = $(@)[0].files[0].name
-          if path isnt ''
-            $('#fake').addClass('loading disabled').html "Uploading #{path}&hellip;"
-            $('input:submit').trigger 'click'
-        $('<a id="fake">').html('Select a file&hellip;').on('click', ->
-          $('#file').trigger 'click'
-        ).addClass('btn btn-primary').appendTo '#up'
+
+startFileUpload = (e) ->
+  path = $(this)[0].files[0].name
+  if path isnt ''
+    $('#fake').addClass('loading disabled').html "Uploading #{path}&hellip;"
+    $('input:submit').trigger 'click'
+
+settings = scraperwiki.readSettings()
+
+# set up special form inputs 
+$('#next').val "#{window.location.pathname}done.html#{window.location.hash}"
+$('#apikey').val settings.source.apikey
+
+# hide existing form elements, create new more styleable one
+$('input:submit').hide()
+$('<a id="fake">').html('Select a file&hellip;').on('click', ->
+  $('#file').trigger 'click'
+).addClass('btn btn-primary').appendTo '#up'
+$('#file').hide().on('change', startFileUpload)
+
     </script>
   </body>
 </html>

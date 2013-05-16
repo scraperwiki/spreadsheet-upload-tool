@@ -19,7 +19,11 @@ import scraperwiki
 
 from collections import OrderedDict, Counter
 
-class HeaderError(Exception):
+class HeaderWidthError(Exception):
+    pass
+
+
+class NullHeaderError(Exception):
     pass
 
 
@@ -88,7 +92,7 @@ def validateHeaders(rows):
     """
     rowLengths = [ len(row) for row in rows[1:] ]
     if len(rows[0]) < max(rowLengths):
-        raise HeaderError("Your header row isn't the widest in the table")
+        raise HeaderWidthError("Your header row isn't the widest in the table")
 
 
 def validateConsistency(dictRows, precision=0.8):

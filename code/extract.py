@@ -43,7 +43,6 @@ def main(argv=None):
 
     except Exception, e:
         # catch errors and wrap as JSON for frontend to display
-        print type(e).__name__
         ret = {
             'errorType': type(e).__name__,
             'errorMessage': str(e)

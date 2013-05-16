@@ -22,7 +22,7 @@
 
 handleExecOutput = (output) ->
   try
-    obj = JSON.parse(data)
+    obj = JSON.parse(output)
   catch error
     scraperwiki.alert("Unexpected output returned from extraction script", error, 1)
     $('body').append("""<a href="./#{location.hash}" class="btn btn-primary">Try again!</a>""")

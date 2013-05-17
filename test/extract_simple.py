@@ -9,7 +9,7 @@ from collections import OrderedDict
 import extract
 
 def test_it_can_extract_a_simple_xls_file():
-    sheets = extract.extract('fixture/simple.xls')
+    sheets = extract.validate(extract.extract('fixture/simple.xls'))
     assert_equals(type(sheets), OrderedDict)
     assert_equals(len(sheets), 1)
 
@@ -20,7 +20,7 @@ def test_it_can_extract_a_simple_xls_file():
     assert_equals(row['Awesomeness'], 8)
 
 def test_it_can_extract_a_simple_xlsx_file():
-    sheets = extract.extract('fixture/simple.xlsx')
+    sheets = extract.validate(extract.extract('fixture/simple.xlsx'))
     assert_equals(type(sheets), OrderedDict)
     assert_equals(len(sheets), 1)
 
@@ -31,7 +31,7 @@ def test_it_can_extract_a_simple_xlsx_file():
     assert_equals(row['Awesomeness'], 8)
 
 def test_it_saves_to_the_database():
-    sheets = extract.extract('fixture/simple.xlsx')
+    sheets = extract.validate(extract.extract('fixture/simple.xlsx'))
     extract.save(sheets)
 
     data = scraperwiki.sql.select('* from Sheet1')
@@ -40,7 +40,7 @@ def test_it_saves_to_the_database():
     assert_equals(row['Awesomeness'], 8)
 
 def test_it_can_extract_a_simple_csv_file():
-    sheets = extract.extract('fixture/simple.csv')
+    sheets = extract.validate(extract.extract('fixture/simple.csv'))
     assert_equals(type(sheets), OrderedDict)
     assert_equals(len(sheets), 1)
 

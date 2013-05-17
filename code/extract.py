@@ -38,7 +38,7 @@ def main(argv=None):
             filename = argv[1]
         if len(argv) != 2:
             raise ValueError("Please supply exactly one argument")
-        save(extract(filename))
+        save(validate(extract(filename)))
 
     except Exception, e:
         # catch errors and wrap as JSON for frontend to display
@@ -58,8 +58,7 @@ def main(argv=None):
 
 
 def extract(filename, verbose=False):
-    """Convert a file into a list (workbook) of lists (sheets) of lists (rows)
-    and then perform checks, and if all is ok, return dicts for saving to SQLite"""
+    """Convert a file into a list (workbook) of lists (sheets) of lists (rows)"""
 
     (fileType, encoding) = detectType(filename)
     if fileType not in ['xls', 'xlsx', 'csv']:
@@ -69,6 +68,14 @@ def extract(filename, verbose=False):
         workbook, sheetNames = extractCSV(filename, encoding)
     else:
         workbook, sheetNames = extractExcel(filename)
+
+    return (workbook, sheetNames)
+
+
+def validate(output_from_extract):
+    """perform checks on output of extract(), and if all is ok, return dicts for saving to SQLite"""
+
+    workbook, sheetNames = output_from_extract
 
     for sheet in workbook:
         validateHeaders(sheet)

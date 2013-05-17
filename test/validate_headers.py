@@ -13,5 +13,5 @@ def test_it_raises_error_when_first_row_is_not_widest_row():
 
 @raises(extract.NullHeaderError)
 def test_it_raises_error_when_first_row_contains_empty_cells():
-    workbook, sheetNames = extract.extractCSV('fixture/empty-header-cells.csv')
+    workbook, sheetNames = extract.extractCSV('fixture/empty-header-cells.csv', 'ascii')
     extract.validateHeaders(workbook[0])

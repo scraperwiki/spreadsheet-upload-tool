@@ -9,8 +9,9 @@ import scraperwiki
 import extract
 
 def test_it_detects_unicode_csv_file():
-    filetype = extract.detectType('fixture/mps_unicode.csv')
+    (filetype, encoding) = extract.detectType('fixture/mps_unicode.csv')
     assert_equals(filetype, 'csv')
+    assert_equals(encoding, 'utf-8')
 
 
 def test_it_can_extract_a_unicode_csv():
@@ -32,3 +33,6 @@ def test_it_saves_a_unicode_csv_to_the_database():
     row = data[460]
     assert_equals(row['MP Name'], 'Michelle Gildernew')
     assert_equals(row['Party'], u'Sinn Féin')
+
+    scraperwiki.sql.execute('drop table swdata')
+    scraperwiki.sql.commit()

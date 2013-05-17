@@ -62,12 +62,13 @@ def extract(filename, verbose=False):
     """Convert a file into a list (workbook) of lists (sheets) of lists (rows)
     and then perform checks, and if all is ok, return dicts for saving to SQLite"""
 
-    fileType = detectType(filename)
+    (fileType, encoding) = detectType(filename)
     if fileType not in ['xls', 'xlsx', 'csv']:
         raise ValueError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
 
     if fileType == 'csv':
-        workbook, sheetNames = extractCSV(filename)
+        print encoding
+        workbook, sheetNames = extractCSV(filename, encoding)
     else:
         workbook, sheetNames = extractExcel(filename)
 
@@ -89,17 +90,18 @@ def detectType(filename):
     Possible output values are: "xls", "xlsx", "csv", or something unexpected"""
     rawFileType = magic.from_file(filename)
     if rawFileType == 'ASCII text':
-        return 'csv'
+        return ('csv', 'ascii')
     if 'UTF-8 Unicode' in rawFileType:
-        return 'csv'
-    elif rawFileType == 'Microsoft Excel 2007+':
-        return 'xlsx'
-    elif 'Excel' in rawFileType:
-        return 'xls'
-    elif 'Zip archive' in rawFileType and filename.endswith('.xlsx'):
-        return 'xlsx'
-    else:
-        return rawFileType
+        return ('csv', 'utf-8')
+    if 'ISO-8859' in rawFileType:
+        return ('csv', 'latin-1')
+    if rawFileType == 'Microsoft Excel 2007+':
+        return ('xlsx', None)
+    if 'Excel' in rawFileType:
+        return ('xls', None)
+    if 'Zip archive' in rawFileType and filename.endswith('.xlsx'):
+        return ('xlsx', None)
+    return (rawFileType, None)
 
 
 def validateHeaders(rows):
@@ -156,7 +158,7 @@ def extractExcel(filename):
     return workbook, sheetNames
 
 
-def extractCSV(filename):
+def extractCSV(filename, encoding):
     """Takes a csv file location, turns it into a
     list with one item which is a list (sheet) of lists (rows)"""
 
@@ -165,7 +167,7 @@ def extractCSV(filename):
     with open(filename, 'r') as f:
         sheet = []
         # we could use strict=True here too but may produce too many errors
-        for row in unicodecsv.reader(f, encoding="utf-8", skipinitialspace=True):
+        for row in unicodecsv.reader(f, encoding=encoding, skipinitialspace=True):
             typeConvertedRow = [ convertField(cell) for cell in row ]
             sheet.append(typeConvertedRow)
         workbook.append(sheet)

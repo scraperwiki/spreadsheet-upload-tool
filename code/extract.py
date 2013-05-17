@@ -7,7 +7,7 @@ and store it in a tabular database.
 
 import sys
 import json
-import csv
+import unicodecsv
 import sys
 
 # http://www.lexicon.net/sjmachin/xlrd.html
@@ -165,7 +165,7 @@ def extractCSV(filename):
     with open(filename, 'r') as f:
         sheet = []
         # we could use strict=True here too but may produce too many errors
-        for row in csv.reader(f, skipinitialspace=True):
+        for row in unicodecsv.reader(f, encoding="utf-8", skipinitialspace=True):
             typeConvertedRow = [ convertField(cell) for cell in row ]
             sheet.append(typeConvertedRow)
         workbook.append(sheet)

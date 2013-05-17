@@ -19,6 +19,6 @@ def test_it_can_extract_a_simple_xls_file():
 
     sheet = sheets['swdata']
     assert_equals(len(sheet), 653)
-    row = sheet[15]
-    assert_equals(row['MP Name'], u'Albert Owen')
-    assert_equals(row['Constituency'], u'Ynys Môn')
+    row = sheet[460]
+    assert_equals(row['MP Name'], 'Michelle Gildernew')
+    assert_equals(row['Party'], u'Sinn Féin')

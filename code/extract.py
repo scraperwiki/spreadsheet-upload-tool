@@ -64,7 +64,7 @@ def extract(filename, verbose=False):
 
     fileType = detectType(filename)
     if fileType not in ['xls', 'xlsx', 'csv']:
-        raise ValueError("Unknown file type (I only understand .csv, .xls and .xlsx)")
+        raise ValueError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
 
     if fileType == 'csv':
         workbook, sheetNames = extractCSV(filename)
@@ -90,7 +90,7 @@ def detectType(filename):
     rawFileType = magic.from_file(filename)
     if rawFileType == 'ASCII text':
         return 'csv'
-    if 'UTF-8 Unicode text' in rawFileType:
+    if 'UTF-8 Unicode' in rawFileType:
         return 'csv'
     elif rawFileType == 'Microsoft Excel 2007+':
         return 'xlsx'

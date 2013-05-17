@@ -67,7 +67,6 @@ def extract(filename, verbose=False):
         raise ValueError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
 
     if fileType == 'csv':
-        print encoding
         workbook, sheetNames = extractCSV(filename, encoding)
     else:
         workbook, sheetNames = extractExcel(filename)

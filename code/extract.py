@@ -199,7 +199,7 @@ def convertField(string):
     types = [ int, float ]
     for t in types:
         try:
-            return t(string)
+            return t(string.replace(',', ''))
         except ValueError:
             pass
     return string

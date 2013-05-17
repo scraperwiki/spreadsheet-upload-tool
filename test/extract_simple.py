@@ -39,9 +39,6 @@ def test_it_saves_to_the_database():
     assert_equals(row['Year'], 2012)
     assert_equals(row['Awesomeness'], 8)
 
-    scraperwiki.sql.execute('drop table Sheet1')
-    scraperwiki.sql.commit()
-
 def test_it_can_extract_a_simple_csv_file():
     sheets = extract.extract('fixture/simple.csv')
     assert_equals(type(sheets), OrderedDict)

@@ -8,7 +8,6 @@ and store it in a tabular database.
 import sys
 import json
 import unicodecsv
-import sys
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -191,6 +190,10 @@ def convertToOrderedDicts(workbook, sheetNames):
 
 
 def save(sheets):
+    tables = scraperwiki.sql.show_tables()
+    for table in tables.keys():
+        scraperwiki.sql.execute('drop table "%s"' % table)
+        scraperwiki.sql.commit()
     for sheetName, rows in sheets.items():
         if rows:
             scraperwiki.sql.save([], rows, table_name=sheetName)

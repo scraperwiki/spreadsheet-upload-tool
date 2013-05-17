@@ -33,6 +33,3 @@ def test_it_saves_a_unicode_csv_to_the_database():
     row = data[460]
     assert_equals(row['MP Name'], 'Michelle Gildernew')
     assert_equals(row['Party'], u'Sinn Féin')
-
-    scraperwiki.sql.execute('drop table swdata')
-    scraperwiki.sql.commit()

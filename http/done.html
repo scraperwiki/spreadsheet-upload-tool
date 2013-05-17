@@ -52,6 +52,7 @@ handleExecOutput = (output) ->
     else
       scraperwiki.alert("Oh no!", "We received an unexpected error while structuring your spreadsheet: <code>#{obj.errorType} #{obj.errorMessage}</code>", 1)
   else
+    scraperwiki.tool.rename scraperwiki.readSettings().filePath
     scraperwiki.tool.redirect "/dataset/#{scraperwiki.box}"
 
 handleExecFailure = (jqXHR, textStatus, errorThrown) ->

@@ -90,6 +90,8 @@ def detectType(filename):
     rawFileType = magic.from_file(filename)
     if rawFileType == 'ASCII text':
         return 'csv'
+    if 'UTF-8 Unicode text' in rawFileType:
+        return 'csv'
     elif rawFileType == 'Microsoft Excel 2007+':
         return 'xlsx'
     elif 'Excel' in rawFileType:

@@ -25,6 +25,15 @@
     </form>
     <script type="text/coffeescript">
 
+metaDataSuccess = (meta) ->
+  unless $.isEmptyObject(meta.table)
+    $('#fake').removeClass('btn-primary').addClass('btn-danger')
+      .text('Select a new file*')
+      .after('<p>* this will clear all of your data</p>')
+  
+
+scraperwiki.sql.meta metaDataSuccess
+
 startFileUpload = (e) ->
   path = $(this)[0].files[0].name
   if path isnt ''

@@ -34,3 +34,7 @@ div.error {
   font-size: 32px;
   line-height: 36px;
 }
+
+.btn-danger + p {
+  margin-top: 8px;
+}

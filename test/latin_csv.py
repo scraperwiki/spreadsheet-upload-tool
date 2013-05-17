@@ -15,7 +15,7 @@ def test_it_detects_a_latin1_csv_file():
 
 
 def test_it_can_extract_a_latin1_csv():
-    sheets = extract.extract('fixture/ENH-CCG-spend-2013.csv')
+    sheets = extract.validate(extract.extract('fixture/ENH-CCG-spend-2013.csv'))
     assert_equals(len(sheets), 1)
 
     row = sheets['swdata'][1]

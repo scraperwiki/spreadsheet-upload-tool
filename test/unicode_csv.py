@@ -15,7 +15,7 @@ def test_it_detects_unicode_csv_file():
 
 
 def test_it_can_extract_a_unicode_csv():
-    sheets = extract.extract('fixture/mps_unicode.csv')
+    sheets = extract.validate(extract.extract('fixture/mps_unicode.csv'))
     assert_equals(len(sheets), 1)
 
     sheet = sheets['swdata']
@@ -26,7 +26,7 @@ def test_it_can_extract_a_unicode_csv():
 
 
 def test_it_saves_a_unicode_csv_to_the_database():
-    sheets = extract.extract('fixture/mps_unicode.csv')
+    sheets = extract.validate(extract.extract('fixture/mps_unicode.csv'))
     extract.save(sheets)
 
     data = scraperwiki.sql.select('* from swdata')

@@ -30,6 +30,10 @@ class ConsistencyError(Exception):
     pass
 
 
+class FileTypeError(Exception):
+    pass
+
+
 def main(argv=None):
     try:
         if argv is None:
@@ -62,7 +66,7 @@ def extract(filename, verbose=False):
 
     (fileType, encoding) = detectType(filename)
     if fileType not in ['xls', 'xlsx', 'csv']:
-        raise ValueError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
+        raise FileTypeError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
 
     if fileType == 'csv':
         workbook, sheetNames = extractCSV(filename, encoding)

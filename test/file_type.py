@@ -37,3 +37,7 @@ def test_it_detects_an_xls_file_with_a_csv_extension():
 def test_it_detects_a_random_file_with_a_csv_extension():
     (filetype, encoding) = extract.detectType('fixture/really-a-png.csv')
     assert filetype not in ['csv', 'xls', 'xlsx']
+
+@raises(extract.FileTypeError)
+def test_it_raises_an_exception_for_unexpected_filetypes():
+    extract.extract('fixture/tractor.png')

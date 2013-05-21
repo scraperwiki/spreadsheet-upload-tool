@@ -8,6 +8,7 @@ and store it in a tabular database.
 import sys
 import json
 import unicodecsv
+import traceback
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -50,6 +51,7 @@ def main(argv=None):
             'errorType': type(e).__name__,
             'errorMessage': str(e)
         }
+        traceback.print_exc(file=sys.stderr)
         return json.dumps(ret)
 
     else:

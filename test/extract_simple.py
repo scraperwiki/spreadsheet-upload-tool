@@ -50,6 +50,3 @@ def test_it_can_extract_a_simple_csv_file():
     assert_equals(row['Year'], 2012)
     assert_equals(row['Awesomeness'], 8)
 
-@raises(ValueError)
-def test_it_errors_for_unknown_filetypes():
-    extract.extract('fixture/tractor.png')

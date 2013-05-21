@@ -159,10 +159,11 @@ def extractExcel(filename):
         excelSheet = book.sheet_by_name(sheetName)
         nrows = excelSheet.nrows
         sheet = []
-        for rowx in range(nrows):
-            row = excelSheet.row_values(rowx)
-            sheet.append(row)
-        workbook.append(sheet)
+        if nrows > 0:
+            for rowx in range(nrows):
+                row = excelSheet.row_values(rowx)
+                sheet.append(row)
+            workbook.append(sheet)
 
     return workbook, sheetNames
 

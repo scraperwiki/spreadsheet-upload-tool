@@ -65,13 +65,13 @@ def extract(filename, verbose=False):
     """Convert a file into a list (workbook) of lists (sheets) of lists (rows)"""
 
     (fileType, encoding) = detectType(filename)
-    if fileType not in ['xls', 'xlsx', 'csv']:
-        raise FileTypeError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
 
     if fileType == 'csv':
         workbook, sheetNames = extractCSV(filename, encoding)
-    else:
+    elif fileType == 'excel':
         workbook, sheetNames = extractExcel(filename)
+    else:
+        raise FileTypeError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
 
     return (workbook, sheetNames)
 
@@ -95,22 +95,22 @@ def validate(output_from_extract):
 
 
 def detectType(filename):
-    """Detects the filetype of a given file.
-    Possible output values are: "xls", "xlsx", "csv", or something unexpected"""
+    """Detects the filetype of a given file. Excel, CSV, or anything else."""
     rawFileType = magic.from_file(filename)
-    if rawFileType == 'ASCII text':
-        return ('csv', 'ascii')
-    if 'UTF-8 Unicode' in rawFileType:
-        return ('csv', 'utf-8')
-    if 'ISO-8859' in rawFileType:
-        return ('csv', 'latin-1')
-    if rawFileType == 'Microsoft Excel 2007+':
-        return ('xlsx', None)
-    if 'Excel' in rawFileType:
-        return ('xls', None)
-    if 'Zip archive' in rawFileType and filename.endswith('.xlsx'):
-        return ('xlsx', None)
-    return (rawFileType, None)
+    rawMimeType = magic.from_file(filename, mime=True)
+    if rawMimeType in ['text/plain', 'text/html']:
+        if 'UTF-8 Unicode' in rawFileType:
+            return ('csv', 'utf-8')
+        elif 'ISO-8859' in rawFileType:
+            return ('csv', 'latin-1')
+        else:
+            return ('csv', 'ascii')
+    elif 'application/vnd.ms-excel' in rawMimeType:
+        return ('excel', None)
+    elif rawMimeType == 'application/zip' and filename.endswith('xlsx'):
+        return ('excel', None)
+    else:
+        return (rawFileType, None)
 
 
 def validateHeaders(rows):

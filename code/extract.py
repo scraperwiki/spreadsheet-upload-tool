@@ -8,6 +8,8 @@ and store it in a tabular database.
 import sys
 import json
 import unicodecsv
+import datetime
+import traceback
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -17,6 +19,8 @@ import magic
 import scraperwiki
 
 from collections import OrderedDict, Counter
+
+LOGFILE = 'log.txt'
 
 class HeaderWidthError(Exception):
     pass
@@ -35,12 +39,14 @@ class FileTypeError(Exception):
 
 
 def main(argv=None):
+    log('STARTED', True)
     try:
         if argv is None:
             argv = sys.argv
         if len(argv) > 1:
             filename = argv[1]
         if len(argv) != 2:
+            log("EXCEPTION\nValue Error: Please supply exactly one argument")
             raise ValueError("Please supply exactly one argument")
         save(validate(extract(filename)))
 
@@ -50,6 +56,8 @@ def main(argv=None):
             'errorType': type(e).__name__,
             'errorMessage': str(e)
         }
+        log('EXCEPTION')
+        traceback.print_exc(file=open(LOGFILE,'a'))
         return json.dumps(ret)
 
     else:
@@ -58,17 +66,22 @@ def main(argv=None):
             'errorType': None,
             'errorMessage': None
         }
+        log('COMPLETED')
         return json.dumps(ret)
 
 
 def extract(filename, verbose=False):
     """Convert a file into a list (workbook) of lists (sheets) of lists (rows)"""
 
+    log("Extracting file: %s" % filename)
+
     (fileType, encoding) = detectType(filename)
 
     if fileType == 'csv':
+        log("Filetype: CSV (%s)" % encoding)
         workbook, sheetNames = extractCSV(filename, encoding)
     elif fileType == 'excel':
+        log("Filetype: Excel")
         workbook, sheetNames = extractExcel(filename)
     else:
         raise FileTypeError("Unknown file type <b>%s</b> (I only understand .csv, .xls and .xlsx)" % fileType)
@@ -78,6 +91,8 @@ def extract(filename, verbose=False):
 
 def validate(output_from_extract):
     """perform checks on output of extract(), and if all is ok, return dicts for saving to SQLite"""
+
+    log('Validating extracted data')
 
     workbook, sheetNames = output_from_extract
 
@@ -189,7 +204,7 @@ def convertToOrderedDicts(workbook, sheetNames):
     """Converts a list (workbook) of lists (sheets) of lists (rows) and
     a list of sheetNames, into a dict (workbookForSQL) of lists (sheets) of dicts (rows)"""
     workbookForSQL = OrderedDict()
-    
+
     for sheet, sheetName in zip(workbook, sheetNames):
         sheetForSQL = []
         headers = sheet[0]
@@ -202,6 +217,7 @@ def convertToOrderedDicts(workbook, sheetNames):
 
 
 def save(sheets):
+    log("Saving %s sheet%s" % (len(sheets), 's' if len(sheets) != 1 else ''))
     tables = scraperwiki.sql.show_tables()
     for table in tables.keys():
         scraperwiki.sql.execute('drop table "%s"' % table)
@@ -237,6 +253,15 @@ def humanType(thing):
         return types[t]
     else:
         return t
+
+
+def log(message, newfile=False):
+    if newfile:
+        method = 'w'
+    else:
+        method = 'a'
+    with open(LOGFILE, method) as f:
+        f.write("%s %s\n" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), message))
 
 
 if __name__ == '__main__':

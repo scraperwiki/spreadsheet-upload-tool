@@ -1,4 +1,5 @@
 xlrd
 scraperwiki
 lxml
+python-magic
 unicodecsv

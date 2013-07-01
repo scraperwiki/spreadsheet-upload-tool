@@ -152,13 +152,13 @@ def validateConsistency(dictRows, precision=0.8):
 
     for column in headers:
         types = [humanType(dictRow[column]) for dictRow in dictRows]
-        typesInThisColumn = Counter(types)
+        typeCounts = Counter(types)
         # Avoid checking the 'empty' type; there can be as
         # many or as few of those as we like.
-        del typesInThisColumn['empty']
-        total = sum(typesInThisColumn.values())
+        del typeCounts['empty']
+        total = sum(typeCounts.values())
 
-        for t, frequency in typesInThisColumn.iteritems():
+        for t, frequency in typeCounts.iteritems():
             if precision * total < frequency < total:
                 raise ConsistencyError("The column '%s' is not of a consistent data type" % column)
 

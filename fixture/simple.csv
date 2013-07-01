@@ -1,5 +1,5 @@
-Year,Awesomeness,Weather
-2010,9,cold
-2011,10,cold
-2012,8,rainy
-2013,11,cold
+Year,Awesomeness,Weather,Middle
+2010,9,cold,2010-07-01
+2011,10,cold,2011-07-01
+2012,8,rainy,2012-07-01
+2013,11,cold,2013-07-01

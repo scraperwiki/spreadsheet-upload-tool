@@ -144,8 +144,12 @@ def validateHeaders(rows):
 
 
 def validateConsistency(dictRows, precision=0.8):
-    """Checks each (non-empty) value in the list of dicts is of a consistent type.
-    If a column is more than [precision]% one type, it must be entirely that type.
+    """Checks that each column is of a consistent type (each
+    column corresponds to a key in the list of dicts).
+    If a column is more than a certain fraction (the *precision*)
+    one type, then it must be entirely that type (empty cells
+    are ignored when considering this).
+    An Exception is raised if an inconsistency is detected.
     """
 
     headers = dictRows[0].keys()

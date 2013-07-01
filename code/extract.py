@@ -156,10 +156,10 @@ def validateConsistency(dictRows, precision=0.8):
         # Avoid checking the 'empty' type; there can be as
         # many or as few of those as we like.
         del typesInThisColumn['empty']
-        totalNonEmptyCells = sum(typesInThisColumn.values()) - typesInThisColumn.get('empty', 0)
+        total = sum(typesInThisColumn.values())
 
         for t, frequency in typesInThisColumn.iteritems():
-            if precision * totalNonEmptyCells < frequency < totalNonEmptyCells:
+            if precision * total < frequency < total:
                 raise ConsistencyError("The column '%s' is not of a consistent data type" % column)
 
 

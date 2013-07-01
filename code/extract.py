@@ -7,9 +7,9 @@ and store it in a tabular database.
 
 import sys
 import json
-import unicodecsv
 import datetime
 import traceback
+from collections import OrderedDict, Counter
 
 # http://www.lexicon.net/sjmachin/xlrd.html
 import xlrd
@@ -17,8 +17,8 @@ import xlrd
 import magic
 # https://github.com/scraperwiki/scraperwiki_local
 import scraperwiki
-
-from collections import OrderedDict, Counter
+# https://pypi.python.org/pypi/unicodecsv/
+import unicodecsv
 
 LOGFILE = 'log.txt'
 

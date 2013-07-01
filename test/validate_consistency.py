@@ -28,12 +28,12 @@ def test_it_raises_error_when_column_types_are_not_consistent():
 
 def test_it_does_not_raise_error_when_column_types_are_consistent():
     # construct a single-column table, with a "lat" column
-    # which is 60% floats, 40% empty
+    # which is 52% floats, 48% empty (see issue 14)
     dictRows = []
-    for i in range(60):
+    for i in range(52):
         row = OrderedDict([ ('lat', random.uniform(50.35, 58.56)) ])
         dictRows.append(row)
-    for i in range(40):
+    for i in range(48):
         row = OrderedDict([ ('lat', None) ])
         dictRows.append(row)
 

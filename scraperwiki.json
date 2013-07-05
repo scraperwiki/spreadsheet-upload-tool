@@ -1,5 +1,5 @@
 {
-  "displayName": "Upload a Spreadsheet",
+  "displayName": "Upload a spreadsheet",
   "description": "A structured Excel or CSV file",
   "icon": "https://s3-eu-west-1.amazonaws.com/sw-icons/tool-icon-spreadsheet-upload.png",
   "color": "#029745"

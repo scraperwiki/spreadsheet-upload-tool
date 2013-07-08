@@ -135,8 +135,8 @@ def validateHeaders(rows):
     * the first row isn't the widest
     * the first row contains empty cells
     """
-    rowLengths = [ len(row) for row in rows[1:] ]
-    if len(rows[0]) < max(rowLengths):
+    maxRowLength = max(map(len, rows[1:]))
+    if len(rows[0]) < maxRowLength:
         raise HeaderWidthError("Your header row isn't the widest in the table")
 
     if None in rows[0] or "" in rows[0]:

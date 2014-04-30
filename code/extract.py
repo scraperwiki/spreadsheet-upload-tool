@@ -30,10 +30,6 @@ class NullHeaderError(Exception):
     pass
 
 
-class ConsistencyError(Exception):
-    pass
-
-
 class FileTypeError(Exception):
     pass
 
@@ -103,9 +99,6 @@ def validate(output_from_extract):
     # as lists of dicts (rather than lists of lists)
     workbookForSQL = convertToOrderedDicts(workbook, sheetNames)
 
-    for sheetName, sheetData in workbookForSQL.iteritems():
-        validateConsistency(sheetData)
-
     return workbookForSQL
 
 
@@ -141,30 +134,6 @@ def validateHeaders(rows):
 
     if None in rows[0] or "" in rows[0]:
         raise NullHeaderError("Your header row contains empty cells")
-
-
-def validateConsistency(dictRows, precision=0.8):
-    """Checks that each column is of a consistent type (each
-    column corresponds to a key in the list of dicts).
-    If a column is more than a certain fraction (the *precision*)
-    one type, then it must be entirely that type (empty cells
-    are ignored when considering this).
-    An Exception is raised if an inconsistency is detected.
-    """
-
-    headers = dictRows[0].keys()
-
-    for column in headers:
-        types = [humanType(dictRow[column]) for dictRow in dictRows]
-        typeCounts = Counter(types)
-        # Avoid checking the 'empty' type; there can be as
-        # many or as few of those as we like.
-        del typeCounts['empty']
-        total = sum(typeCounts.values())
-
-        for t, frequency in typeCounts.iteritems():
-            if precision * total < frequency < total:
-                raise ConsistencyError("The column '%s' is not of a consistent data type" % column)
 
 
 def extractExcel(filename):
